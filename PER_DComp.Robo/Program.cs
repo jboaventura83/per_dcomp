@@ -154,8 +154,30 @@ namespace PER_DComp.Robo
                         J: Ano da competência
                         K: Mês da competência
                         L: Recolhimento efetuado?
-                        M: Código de pagamento                                                
-                     
+                        M: Código de pagamento      
+                    
+                        Seção3: Detalhamento GPS
+                        N: Valor INSS
+                        O: Valor Outras Entidades
+                        P: Valor de ATM, Multa e Juros
+                        Q: Data de Arrecadação
+
+                        Seção4: Demonstrativo do Crédito
+                        R: Valor Original do Crédito Inicial
+                        S: Selic Acumulada
+                        T: Crédito Atualizado
+                        U: Tipo de Débito
+
+                        Seção5: Informar e Ordenar Débito
+                        V: Categoria
+                        W: Ano de Apuração
+                        X: Mês de Apuração
+                        Y: Data de Vencimento
+                        Z: Código da Receita
+                        AA: Valor a Compensar
+
+                        Seção6: Informar Dados Gerais
+                        AB: CPF
                      */
 
                     if (totalLinhas > 0)
@@ -180,13 +202,31 @@ namespace PER_DComp.Robo
                                 dadosLinha.DetalhamentoCredito_01 = ws.Cells[i, 6].Value.ToString();
                                 dadosLinha.AlegacaoInconstitucional_01 = ws.Cells[i, 7].Value.ToString().Trim() == "Não" ? false : true;
 
-
                                 dadosLinha.DetentorCredito_02 = ws.Cells[i, 8].Value.ToString();
                                 dadosLinha.CnpjDetentor_02 = ws.Cells[i, 9].Value.ToString();
                                 dadosLinha.AnoCompetencia_02 = Convert.ToInt32(ws.Cells[i, 10].Value.ToString());
                                 dadosLinha.MesCompetencia_02 = ws.Cells[i, 11].Value.ToString();
                                 dadosLinha.RecolhimentoEfetuado_02 = ws.Cells[i, 12].Value.ToString().Trim() == "Não" ? false : true;
                                 dadosLinha.CodigoPagamento_02 = ws.Cells[i, 13].Value.ToString();
+
+                                dadosLinha.ValorInss_03 = ws.Cells[i, 14].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 14].Value.ToString().Trim());
+                                dadosLinha.ValorOutrasEntidades_03 = ws.Cells[i, 15].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 15].Value.ToString().Trim());
+                                dadosLinha.ValorAtmMultaJuros_03 = ws.Cells[i, 16].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 16].Value.ToString().Trim());
+                                dadosLinha.DataArrecadacao_03 = ws.Cells[i, 17].Value.ToString();
+
+                                dadosLinha.ValorOriginal_04 = ws.Cells[i, 18].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 18].Value.ToString().Trim());
+                                dadosLinha.SelicAcumulada_04 = ws.Cells[i, 19].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 19].Value.ToString().Trim());
+                                dadosLinha.CreditoAtualizado_04 = ws.Cells[i, 20].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 20].Value.ToString().Trim());
+                                dadosLinha.TipoDebito_04 = ws.Cells[i, 21].Value.ToString();
+
+                                dadosLinha.Categoria_05 = ws.Cells[i, 22].Value.ToString();
+                                dadosLinha.AnoApuracao_05 = Convert.ToInt32(ws.Cells[i, 23].Value.ToString());
+                                dadosLinha.MesApuracao_05 = ws.Cells[i, 24].Value.ToString();
+                                dadosLinha.DataVencimento_05 = ws.Cells[i, 25].Value.ToString();
+                                dadosLinha.CodigoReceita_05 = ws.Cells[i, 26].Value.ToString();
+                                dadosLinha.ValorCompensar_05 = ws.Cells[i, 27].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 27].Value.ToString().Trim());
+
+                                dadosLinha.Cpf_06 = ws.Cells[i, 28].Value.ToString();
 
                                 _guiaCompensacao.DadosCompensacoes.Add(dadosLinha);
 
@@ -198,14 +238,7 @@ namespace PER_DComp.Robo
                                 continue;
                                 throw;
                             }
-                            
-
-                            /*
-                            ws.Cells[i, 6].Style.Numberformat.Format = "#,###,##0.00";
-                            var valorSST_string = ws.Cells[i, 6].Value.ToString();
-                            if (valorSST_string.IndexOf(",") > 0) { valorSST_string += "00"; valorSST_string = valorSST_string.Substring(0, valorSST_string.IndexOf(",") + 3); }
-                            if (valorSST_string.IndexOf(".") > 0) { valorSST_string += "00"; valorSST_string = valorSST_string.Substring(0, valorSST_string.IndexOf(".") + 3); }
-                            var valorSST = StrToDecimal(valorSST_string); */
+                                                       
 
 
                         }
@@ -262,6 +295,8 @@ namespace PER_DComp.Robo
         private class DadosGuiaCompensacao
         {
             public int Id { get; set; }
+
+            /* Seção 01*/
             public string NovoDocumento_01 { get; set; }
             public bool DocumentoRetificador_01 { get; set; }
             public string TipoCredito_01 { get; set; }
@@ -270,12 +305,38 @@ namespace PER_DComp.Robo
             public string DetalhamentoCredito_01 { get; set; }
             public bool AlegacaoInconstitucional_01 { get; set; }
 
+            /* Seção 02*/
             public string DetentorCredito_02 { get; set; }
             public string CnpjDetentor_02 { get; set; }
             public int AnoCompetencia_02 { get; set; }
             public string MesCompetencia_02 { get; set; }
             public bool RecolhimentoEfetuado_02 { get; set; }
             public string CodigoPagamento_02 { get; set; }
+
+            /* Seção 03*/
+            public decimal ValorInss_03 { get; set; }
+            public decimal ValorOutrasEntidades_03 { get; set; }
+            public decimal ValorAtmMultaJuros_03 { get; set; }
+            public string DataArrecadacao_03 { get; set; }
+
+            /* Seção 04*/
+            public decimal ValorOriginal_04 { get; set; }
+            public decimal SelicAcumulada_04 { get; set; }
+            public decimal CreditoAtualizado_04 { get; set; }
+            public string TipoDebito_04 { get; set; }
+
+            /* Seção 05*/
+            public string Categoria_05 { get; set; }
+            public int AnoApuracao_05 { get; set; }
+            public string MesApuracao_05 { get; set; }
+            public string DataVencimento_05 { get; set; }
+            public string CodigoReceita_05 { get; set; }
+            public decimal ValorCompensar_05 { get; set; }
+
+            /* Seção 06*/
+            public string Cpf_06 { get; set; }
+
+
         }
 
 
@@ -283,5 +344,6 @@ namespace PER_DComp.Robo
 
     
 }
+
 
 
