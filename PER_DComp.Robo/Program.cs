@@ -8,16 +8,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using static System.Net.WebRequestMethods;
 
 namespace PER_DComp.Robo
 {
     class Program
     {
         #region Variáveis Globais
-        private static string _diretorioPadrao = $@"{Directory.GetCurrentDirectory()}\dados";
-        private static string _diretorioPadraoLogs = $@"{Directory.GetCurrentDirectory()}\dados\logs";
-        private static PlanilhaGuiaCompensacao _guiaCompensacao = new PlanilhaGuiaCompensacao();
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static IWebDriver driver = null;
         #endregion
 
@@ -30,239 +28,158 @@ namespace PER_DComp.Robo
             Console.WriteLine("Iniciando Robo PER/DComp v1.0.0 ...");
             Console.ResetColor();
 
-            // cria pasta dados                
-            if (!Directory.Exists(_diretorioPadrao))
+
+            var chromeOptions = new ChromeOptions();
+            //chromeOptions.AddArgument("--disable-blink-features");
+            //chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
+            // options.AddUserProfilePreference("intl.accept_languages", "nl");
+            //chromeOptions.AddArgument("no-sandbox");/html/body/div[1]/header/div/div[2]/div/div/div/nav/div[3]/ul/li/a
+            //chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
+            //chromeOptions.AddExcludedArguments(new List<string>() { "enable-automation" });
+
+            if (driver == null) { driver = new ChromeDriver(ChromeDriverService.CreateDefaultService(), chromeOptions, TimeSpan.FromMinutes(3)); }
+
+            driver.Manage().Timeouts().PageLoad.Add(System.TimeSpan.FromSeconds(30));
+
+            var url = "http://localhost:60932/";
+            url = "https://site-devtest.planicare.pt/";
+            url = "https://site-staging.planicare.pt/";
+
+            driver.Navigate().GoToUrl(url);
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+            driver.Navigate().GoToUrl(url + "network");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+            driver.Navigate().GoToUrl(url + "contact");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+            driver.Navigate().GoToUrl(url + "about");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+            driver.Navigate().GoToUrl(url + "soft");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+
+            driver.Navigate().GoToUrl(url + "legal");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+
+            driver.Navigate().GoToUrl(url + "easy50plus");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+
+            driver.Navigate().GoToUrl(url + "easycare");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+
+            driver.Navigate().GoToUrl(url + "protection");
+            AguardarCarregamentoTela(driver);
+            Thread.Sleep(100);
+
+
+            Util.Log(logger, $"Drivers do ChromeDriver OpenQA.Selenium.Chrome");
+            for (int i = 0; i < 35; i++)
             {
-                Util.Log(logger, $"Criando Diretorio '{_diretorioPadrao}'...");
-                Directory.CreateDirectory(_diretorioPadrao);
-            }
-
-            // cria pasta logs                
-            if (!Directory.Exists(_diretorioPadraoLogs))
-            {
-                Util.Log(logger, $"Criando Diretorio '{_diretorioPadraoLogs}'...");
-                Directory.CreateDirectory(_diretorioPadraoLogs);
-            }
-
-            _guiaCompensacao.Id = 1;
-            _guiaCompensacao.NomeArquivo = "Guia Compensação.xlsx";
-            _guiaCompensacao.DadosCompensacoes = new List<DadosGuiaCompensacao>();
-
-
-            Util.Log(logger, $"Lendo planilha dados ");
-
-            if (LerPlanilha())
-            {
-                Util.Log(logger, $"Leu a planilha de dados");
-
-                var chromeOptions = new ChromeOptions();
-                chromeOptions.AddArgument("--disable-blink-features");
-                chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
-                // options.AddUserProfilePreference("intl.accept_languages", "nl");
-                chromeOptions.AddArgument("no-sandbox");
-                chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
-                chromeOptions.AddExcludedArguments(new List<string>() { "enable-automation" });
-
-                if (driver == null) { driver = new ChromeDriver(ChromeDriverService.CreateDefaultService(), chromeOptions, TimeSpan.FromMinutes(3)); }
-
-                driver.Manage().Timeouts().PageLoad.Add(System.TimeSpan.FromSeconds(30));
-
-                Util.Log(logger, $"Drivers do ChromeDriver OpenQA.Selenium.Chrome");
-
-                Util.Log(logger, $"Abrindo página portal e-Cac");
-
-                driver.Navigate().GoToUrl("https://cav.receita.fazenda.gov.br/autenticacao/login");
+                driver.Navigate().GoToUrl(url);
 
                 AguardarCarregamentoTela(driver);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("POR FAVOR, EFETUE O LOGIN NO PORTAL eCAC e pressione ENTER");
-                Console.ResetColor();
+                Thread.Sleep(1000);
 
-                Util.Log(logger, $"Aguardando usuário fazer login...");
-
-                Console.ReadKey();
-
-                Util.Log(logger, $"Abrindo página portal e-Cac");
-
-                driver.Navigate().GoToUrl("https://cav.receita.fazenda.gov.br/ecac/Aplicacao.aspx?id=10006&origem=pesquisa");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Request nº " + i);
             }
-            else
+
+            for (int i = 0; i < 100; i++)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("A planilha de compensação não possui dados ou não pode ser lida.");
-                Console.ResetColor();
-                
-                Util.Log(logger, $"A planilha de compensação não possui dados ou não pode ser lida.");
+                driver.Navigate().GoToUrl(url);
+
+                AguardarCarregamentoTela(driver);
+
+                Thread.Sleep(1000);
+
+                driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[2]/div/div/div/nav/div[3]/ul/li/a")).Click();
+
+                Thread.Sleep(500);
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_ages-selectized\"]")).Click();
+
+                Thread.Sleep(500);
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_ages-selectized\"]")).SendKeys("40");
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_ages-selectized\"]")).SendKeys(Keys.Return);
+
+                Thread.Sleep(500);
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_name\"]")).SendKeys("Joe Banana");
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_name\"]")).SendKeys(Keys.Return);
+
+                Thread.Sleep(500);
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_cellphone\"]")).SendKeys("921077473");
+
+                driver.FindElement(By.XPath("//*[@id=\"sim_cellphone\"]")).SendKeys(Keys.Return);
+
+                //
+                ///
+
+                Thread.Sleep(500);
+
+                driver.FindElement(By.XPath("//*[@id=\"simulator_btn_sim\"]")).Click();
+
+                Thread.Sleep(3000);
+
+                if (driver.FindElements(By.XPath("//*[@id=\"simulator_page_2\"]/div[1]/div[1]/h2")).Count > 0)
+                {
+                    continue;
+                }
+                else
+                {
+                    Thread.Sleep(3000);
+                    if (driver.FindElements(By.XPath("//*[@id=\"simulator_page_2\"]/div[1]/div[1]/h2")).Count > 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Thread.Sleep(3000);
+
+                        if (driver.FindElements(By.XPath("//*[@id=\"simulator_page_2\"]/div[1]/div[1]/h2")).Count > 0)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            if (driver.FindElements(By.XPath("//*[@id=\"simulator_page_1\"]/div[2]/div/div[2]/div/div/div[4]/div[1]")).Count > 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    
+
+                }
+
+
             }
-            
-            
+
+
         }
 
         private static void AguardarCarregamentoTela(IWebDriver driver)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(20)).Until(d => ((IJavaScriptExecutor)d).ExecuteScript("return document.readyState").Equals("complete"));
-        }
-
-        private static bool LerPlanilha()
-        {
-            try
-            {
-                FileInfo arquivo = new FileInfo($"{_diretorioPadrao}/{_guiaCompensacao.NomeArquivo}");
-                
-                using (ExcelPackage package = new ExcelPackage(arquivo))
-                {
-                    ExcelWorksheet ws;
-                    //pega dados da aba "Dados" ou primeira aba
-                    ws = package.Workbook.Worksheets[0];
-                    Console.WriteLine("Iniciando leitura planilha guia de compensação...");
-                    Util.Log(logger, $"Iniciando leitura planilha guia de compensação...");
-                    var totalLinhas = 0;
-                    for (int j = 4; j < ws.Cells.Rows; j++)
-                    {
-                        try
-                        {
-                            if (!String.IsNullOrEmpty(ws.Cells[j, 1].Value.ToString()))
-                            {
-                                totalLinhas++;
-                            }
-                        }
-                        catch (Exception)
-                        {
-
-                            break;
-                        }
-
-                    }
-
-
-                    /*
-                     CAMPOS da Planilha Guia de Compensação
-
-                        Seção 1: Identificar Documento                     
-                        A: Novo Documento
-                        B: Documento Retificafor?
-                        C: Tipo de Crédito
-                        D: Apelido documento
-                        E: Qualificação do Contribuinte
-                        F: Detalhamento do Crédito
-                        G: Alegação de inconstitucionalidade?
-
-                        Seção2: Identificação do Crédito
-                        H: Detentor do crédito
-                        I: CNPJ do Detentor
-                        J: Ano da competência
-                        K: Mês da competência
-                        L: Recolhimento efetuado?
-                        M: Código de pagamento      
-                    
-                        Seção3: Detalhamento GPS
-                        N: Valor INSS
-                        O: Valor Outras Entidades
-                        P: Valor de ATM, Multa e Juros
-                        Q: Data de Arrecadação
-
-                        Seção4: Demonstrativo do Crédito
-                        R: Valor Original do Crédito Inicial
-                        S: Selic Acumulada
-                        T: Crédito Atualizado
-                        U: Tipo de Débito
-
-                        Seção5: Informar e Ordenar Débito
-                        V: Categoria
-                        W: Ano de Apuração
-                        X: Mês de Apuração
-                        Y: Data de Vencimento
-                        Z: Código da Receita
-                        AA: Valor a Compensar
-
-                        Seção6: Informar Dados Gerais
-                        AB: CPF
-                     */
-
-                    if (totalLinhas > 0)
-                    {
-                        
-                        Console.WriteLine($"Total de linhas encontrado = {totalLinhas}");
-                        totalLinhas += 4; // compensa o início do cabeçalho 
-
-                        var totalLinhasOK = 0;
-
-                        for (int i = 4; i < totalLinhas; i++)
-                        {
-                            var dadosLinha = new DadosGuiaCompensacao();
-
-                            try
-                            {
-                                dadosLinha.NovoDocumento_01 = ws.Cells[i, 1].Value.ToString();
-                                dadosLinha.DocumentoRetificador_01 = ws.Cells[i, 2].Value.ToString().Trim() == "Não" ? false : true;
-                                dadosLinha.TipoCredito_01 = ws.Cells[i, 3].Value.ToString();
-                                dadosLinha.ApelidoDocumento_01 = ws.Cells[i, 4].Value.ToString();
-                                dadosLinha.QualificacaoContribuinte_01 = ws.Cells[i, 5].Value.ToString();
-                                dadosLinha.DetalhamentoCredito_01 = ws.Cells[i, 6].Value.ToString();
-                                dadosLinha.AlegacaoInconstitucional_01 = ws.Cells[i, 7].Value.ToString().Trim() == "Não" ? false : true;
-
-                                dadosLinha.DetentorCredito_02 = ws.Cells[i, 8].Value.ToString();
-                                dadosLinha.CnpjDetentor_02 = ws.Cells[i, 9].Value.ToString();
-                                dadosLinha.AnoCompetencia_02 = Convert.ToInt32(ws.Cells[i, 10].Value.ToString());
-                                dadosLinha.MesCompetencia_02 = ws.Cells[i, 11].Value.ToString();
-                                dadosLinha.RecolhimentoEfetuado_02 = ws.Cells[i, 12].Value.ToString().Trim() == "Não" ? false : true;
-                                dadosLinha.CodigoPagamento_02 = ws.Cells[i, 13].Value.ToString();
-
-                                dadosLinha.ValorInss_03 = ws.Cells[i, 14].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 14].Value.ToString().Trim());
-                                dadosLinha.ValorOutrasEntidades_03 = ws.Cells[i, 15].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 15].Value.ToString().Trim());
-                                dadosLinha.ValorAtmMultaJuros_03 = ws.Cells[i, 16].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 16].Value.ToString().Trim());
-                                dadosLinha.DataArrecadacao_03 = ws.Cells[i, 17].Value.ToString();
-
-                                dadosLinha.ValorOriginal_04 = ws.Cells[i, 18].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 18].Value.ToString().Trim());
-                                dadosLinha.SelicAcumulada_04 = ws.Cells[i, 19].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 19].Value.ToString().Trim());
-                                dadosLinha.CreditoAtualizado_04 = ws.Cells[i, 20].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 20].Value.ToString().Trim());
-                                dadosLinha.TipoDebito_04 = ws.Cells[i, 21].Value.ToString();
-
-                                dadosLinha.Categoria_05 = ws.Cells[i, 22].Value.ToString();
-                                dadosLinha.AnoApuracao_05 = Convert.ToInt32(ws.Cells[i, 23].Value.ToString());
-                                dadosLinha.MesApuracao_05 = ws.Cells[i, 24].Value.ToString();
-                                dadosLinha.DataVencimento_05 = ws.Cells[i, 25].Value.ToString();
-                                dadosLinha.CodigoReceita_05 = ws.Cells[i, 26].Value.ToString();
-                                dadosLinha.ValorCompensar_05 = ws.Cells[i, 27].Value.ToString().Trim() == "-" ? 0m : StrToDecimal(ws.Cells[i, 27].Value.ToString().Trim());
-
-                                dadosLinha.Cpf_06 = ws.Cells[i, 28].Value.ToString();
-
-                                _guiaCompensacao.DadosCompensacoes.Add(dadosLinha);
-
-                                totalLinhasOK++;
-
-                            }
-                            catch (Exception)
-                            {
-                                continue;
-                                throw;
-                            }
-                                                       
-
-
-                        }
-
-                        if(totalLinhasOK > 0)
-                        {
-                            _guiaCompensacao.TotalLinhas = totalLinhasOK;
-                            Console.WriteLine($"Total de linhas lidas OK = {totalLinhasOK}");
-                            return true;
-                        }
-
-                        
-                    }
-
-                    return false;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Util.Log(logger, $" Erro indeterminado - { ex.Message} - { ex.ToString()}");
-                return false;
-            }
-
         }
 
 
